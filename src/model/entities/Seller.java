@@ -7,10 +7,10 @@ import java.util.Objects;
 public class Seller implements Serializable {
     
     private Integer id;
-    private String name;
+    private String name; //Nome
     private String email;
-    private Date birthDate;
-    private Double baseSalary;
+    private Date birthDate; //Aniversario
+    private Double baseSalary; //Salario 
     
     private Department department;
     
