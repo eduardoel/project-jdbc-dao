@@ -53,7 +53,7 @@ public class SellerDaoJDBC implements SellerDao {
             rs = st.executeQuery();
             if (rs.next()) {
                 //Se ter o que foi solicitado irá executar abaixo, se não retorna null
-                Department dep = instantiateDepartament(rs);
+                Department dep = instantiateDepartment(rs);
                 Seller obj = instantiateSeller(rs, dep);
                 return obj;
             }
@@ -71,7 +71,7 @@ public class SellerDaoJDBC implements SellerDao {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private Department instantiateDepartament(ResultSet rs) throws SQLException {
+    private Department instantiateDepartment(ResultSet rs) throws SQLException {
         Department dep = new Department();
         dep.setId(rs.getInt("DepartmentId"));
         dep.setName(rs.getString("DepName"));
@@ -98,24 +98,24 @@ public class SellerDaoJDBC implements SellerDao {
                     "SELECT seller.*,department.Name as DepName "
                     + "FROM seller INNER JOIN department "
                     + "ON seller.DepartmentId = department.Id "
-                    + "WHERE DepartmentId = ?"
+                    + "WHERE DepartmentId = ? "
                     + "ORDER BY Name");
 
-            st.setInt(1, department.getId());// numero (1) usado para o caractere "?"
+            st.setInt(1, department.getId());
+
             rs = st.executeQuery();
-            
-            List<Seller> list = new ArrayList<>();//Lista para retornar para o metodo
+
+            List<Seller> list = new ArrayList<>();
             Map<Integer, Department> map = new HashMap<>();
-            
+
             while (rs.next()) {
-                //Para testar se o departamento ja existe
                 Department dep = map.get(rs.getInt("DepartmentId"));
-                
-                if(dep == null) {//Se o departamento não existir ele vai instanciar e salvar no map
-                    dep = instantiateDepartament(rs);
+
+                if (dep == null) {
+                    dep = instantiateDepartment(rs);
                     map.put(rs.getInt("DepartmentId"), dep);
                 }
-                
+
                 Seller obj = instantiateSeller(rs, dep);
                 list.add(obj);
             }
@@ -127,5 +127,4 @@ public class SellerDaoJDBC implements SellerDao {
             DB.closeResultSet(rs);
         }
     }
-
 }
