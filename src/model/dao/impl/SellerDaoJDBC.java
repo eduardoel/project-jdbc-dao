@@ -39,7 +39,7 @@ public class SellerDaoJDBC implements SellerDao {
     }
 
     @Override
-    public Seller findById(Integer id) {
+    public Seller findById(Integer id) { //BUSCAR POR ID
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -67,8 +67,40 @@ public class SellerDaoJDBC implements SellerDao {
     }
 
     @Override
-    public List<Seller> findAll() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<Seller> findAll() { //BUSCAR TODOS
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.prepareStatement(
+                    "SELECT seller.*,department.Name as DepName "
+                    + "FROM seller INNER JOIN department "
+                    + "ON seller.DepartmentId = department.Id "
+                    + "ORDER BY Name");
+
+            rs = st.executeQuery();
+
+            List<Seller> list = new ArrayList<>(); //Lista para retornar para o metodo
+            Map<Integer, Department> map = new HashMap<>(); //Controle de não repetição de departamento
+
+            while (rs.next()) {
+                Department dep = map.get(rs.getInt("DepartmentId"));
+
+                if (dep == null) { //Se o departamento não existir ele vai instanciar e salvar no map
+                    dep = instantiateDepartment(rs);
+                    map.put(rs.getInt("DepartmentId"), dep);
+                }
+
+                Seller obj = instantiateSeller(rs, dep);
+                list.add(obj);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
     }
 
     private Department instantiateDepartment(ResultSet rs) throws SQLException {
@@ -90,7 +122,7 @@ public class SellerDaoJDBC implements SellerDao {
     }
 
     @Override
-    public List<Seller> findByDepartment(Department department) {
+    public List<Seller> findByDepartment(Department department) { //BUSCAR POR DEPARTAMENTO
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -101,17 +133,17 @@ public class SellerDaoJDBC implements SellerDao {
                     + "WHERE DepartmentId = ? "
                     + "ORDER BY Name");
 
-            st.setInt(1, department.getId());
+            st.setInt(1, department.getId()); // numero (1) usado para o caractere "?"
 
             rs = st.executeQuery();
 
-            List<Seller> list = new ArrayList<>();
-            Map<Integer, Department> map = new HashMap<>();
+            List<Seller> list = new ArrayList<>(); //Lista para retornar para o metodo
+            Map<Integer, Department> map = new HashMap<>(); //Controle de não repetição de departamento
 
             while (rs.next()) {
                 Department dep = map.get(rs.getInt("DepartmentId"));
 
-                if (dep == null) {
+                if (dep == null) { //Se o departamento não existir ele vai instanciar e salvar no map
                     dep = instantiateDepartment(rs);
                     map.put(rs.getInt("DepartmentId"), dep);
                 }
