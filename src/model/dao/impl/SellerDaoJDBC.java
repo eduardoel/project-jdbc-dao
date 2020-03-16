@@ -117,7 +117,7 @@ public class SellerDaoJDBC implements SellerDao {
             st.setInt(1, id);// numero (1) usado para o caractere "?"
             rs = st.executeQuery();
             if (rs.next()) {
-                //Se ter o que foi solicitado irá executar abaixo, se não retorna null
+                //Se obter o que foi solicitado irá executar abaixo, se não retorna null
                 Department dep = instantiateDepartment(rs);
                 Seller obj = instantiateSeller(rs, dep);
                 return obj;
